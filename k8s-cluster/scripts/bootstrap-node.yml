@@ -1,0 +1,26 @@
+---
+- name: Install a list of packages 
+  yum:
+    name:
+      - epel-release
+      - python-pip
+      - tree
+      - net-tools
+    state: present
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: setenforce 0
+  command: /sbin/setenforce 0
+
+- name: Stop and disable firewalld.
+  service:
+    name: firewalld
+    state: stopped
+    enabled: False
+
+#- name: Unconditionally reboot the machine with all defaults
+#  reboot:
+#    reboot_timeout: 600

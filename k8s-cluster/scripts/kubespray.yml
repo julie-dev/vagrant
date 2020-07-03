@@ -1,0 +1,8 @@
+---
+- git:
+    repo: https://github.com/kubernetes-sigs/kubespray
+    dest: /home/vagrant/kubespray
+
+- name: run kubespray
+  command: ansible-playbook --flush-cache -u vagrant -b -i /home/vagrant/kubespray/inventory/athene/inventory /home/vagrant/kubespray/cluster.yml
+  register: kubespray_output

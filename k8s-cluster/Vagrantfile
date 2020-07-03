@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ANSIBLE_SERVER_IPADDR = "192.168.50.100"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.ssh.insert_key=true
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory=2048
+    v.cpus=2
+    v.linked_clone=2
+  end
+
+  nodes = [
+    { :name => "master", :ip => "192.168.50.10"},
+    { :name => "node1", :ip => "192.168.50.11"},
+    { :name => "node2", :ip => "192.168.50.12"},
+  ]
+
+  nodes.each do |opts|
+    config.vm.define opts[:name] do |node|
+      node.vm.hostname = opts[:name] + ".k8s.test"
+      node.vm.network :private_network, ip: opts[:ip]
+    end
+  end
+
+  config.vm.define "ansible-server" do |ans|  
+    ans.vm.hostname="ansible-server"
+    ans.vm.network :private_network, ip: ANSIBLE_SERVER_IPADDR
+    ans.vm.provision "file", source: "scripts/bootstrap.yml", destination: "bootstrap.yml"
+    ans.vm.provision "file", source: "scripts/bootstrap-master.yml", destination: "bootstrap-master.yml"
+    ans.vm.provision "file", source: "scripts/bootstrap-node.yml", destination: "bootstrap-node.yml"
+    ans.vm.provision "file", source: "scripts/inventory", destination: "inventory"
+    ans.vm.provision "file", source: "scripts/auto_ssh_connect.yml", destination: "auto_ssh_connect.yml"
+    ans.vm.provision "file", source: "scripts/launch.yml", destination: "launch.yml"
+#ans.vm.provision "shell", inline: "ansible-playbook launch_cluster.yml"
+  end
+
+end

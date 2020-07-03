@@ -1,0 +1,21 @@
+---
+- hosts: kube-master 
+  gather_facts: no
+  become: true
+
+  tasks:
+  - name: Retrieve helm binary archive.
+    unarchive:
+      src: https://get.helm.sh/helm-v3.1.1-linux-amd64.tar.gz 
+      dest: /tmp
+      creates: /usr/local/bin/helm
+      remote_src: yes
+
+  - name: Move helm binary into place.
+    command: >
+      cp /tmp/linux-amd64/helm /usr/local/bin/helm
+      creates=/usr/local/bin/helm
+
+  - name: Install helm chart
+    become: false
+    shell: helm repo add stable https://kubernetes-charts.storage.googleapis.com/

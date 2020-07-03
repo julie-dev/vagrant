@@ -1,0 +1,27 @@
+# ## Configure 'ip' variable to bind kubernetes services on a
+# ## different ip than the default iface
+# ## We should set etcd_member_name for etcd cluster. The node that is not a etcd member do not need to set the value, or can set the empty string value.
+[all]
+master.k8s.test ansible_host=192.168.50.10 ip=192.168.50.10
+node1.k8s.test  ansible_host=192.168.50.11 ip=192.168.50.11
+node2.k8s.test  ansible_host=192.168.50.12 ip=192.168.50.12
+
+# ## configure a bastion host if your nodes are not directly reachable
+# bastion ansible_host=x.x.x.x ansible_user=some_user
+
+[kube-master]
+master.k8s.test
+
+[etcd]
+master.k8s.test
+
+[kube-node]
+node1.k8s.test
+node2.k8s.test
+
+[calico-rr]
+
+[k8s-cluster:children]
+kube-master
+kube-node
+calico-rr

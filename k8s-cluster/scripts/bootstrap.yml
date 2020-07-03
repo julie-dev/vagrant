@@ -1,0 +1,23 @@
+---
+- hosts: localhost 
+  become: true
+
+  tasks:
+  - name: Install a list of packages 
+    yum:
+      name:
+        - epel-release
+        - git 
+        - ansible 
+        - python-pip
+        - python-netaddr
+        - tree
+        - vim
+        - net-tools
+      state: present
+
+  - name: Ensure dependencies are installed.
+    pip:
+      name:
+        - jinja2 
+      state: present

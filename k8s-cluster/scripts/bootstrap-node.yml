@@ -1,25 +1,50 @@
 ---
-- name: Install a list of packages 
-  yum:
-    name:
-      - epel-release
-      - python-pip
-      - tree
-      - net-tools
-    state: present
+- hosts: all
+  gather_facts: no
 
-- name: Disable SELinux
-  selinux:
-    state: disabled
+  tasks:
+    - name: Install a list of packages 
+      yum:
+        name:
+          - epel-release
+          - tree
+          - net-tools
+          - sshpass
+        state: present
 
-- name: setenforce 0
-  command: /sbin/setenforce 0
+    - name: Disable SELinux
+      selinux:
+        state: disabled
 
-- name: Stop and disable firewalld.
-  service:
-    name: firewalld
-    state: stopped
-    enabled: False
+    - name: setenforce 0
+      command: /sbin/setenforce 0
+
+    - name: Stop and disable firewalld.
+      service:
+        name: firewalld
+        state: stopped
+        enabled: False
+
+    - name: Install python-pip
+      yum:
+        name:
+          - python-pip
+        state: present
+
+    - name: pip Upgrade
+      pip:
+        name:
+          - pip 
+        extra_args: "--upgrade"
+        state: present
+
+    - name: Ensure jinja2 installed.
+      pip:
+        name:
+          - jinja2 
+        extra_args: "--upgrade"
+        state: present
+
 
 #- name: Unconditionally reboot the machine with all defaults
 #  reboot:

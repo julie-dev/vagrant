@@ -1,6 +1,5 @@
 ---
 - hosts: kube-master 
-  gather_facts: no
   become: true
 
   tasks:
@@ -16,6 +15,114 @@
       cp /tmp/linux-amd64/helm /usr/local/bin/helm
       creates=/usr/local/bin/helm
 
-  - name: Install helm chart
+  - name: Add helm repository to local
     become: false
     shell: helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+
+  - name: Copy Dockerfile
+    copy:
+      src: /home/vagrant/docker
+      dest: /home/vagrant
+      directory_mode: true
+      owner: vagrant
+      group: vagrant
+
+  - name: Copy Kubeconfig ~/.kube/config
+    file:
+      path: /home/vagrant/.kube
+      state: directory
+      owner: vagrant
+      group: vagrant
+      mode: '0755'
+
+  - name: Copy Kubeconfig ~/.kube/config
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /home/vagrant/.kube/config
+      owner: vagrant
+      group: vagrant
+      mode: '0755'
+      remote_src: yes
+
+  - name: Copy Kubeconfig ~/docker/test/config
+    copy:
+      src: /home/vagrant/.kube/config
+      dest: /home/vagrant/docker/test/config
+      owner: vagrant
+      group: vagrant
+      mode: '0644'
+      remote_src: yes
+
+  - name: Copy Helm Chart 
+    copy:
+      src: /home/vagrant/helm
+      dest: /home/vagrant
+      directory_mode: true
+      owner: vagrant
+      group: vagrant
+
+  - name: Copy Controller
+    copy:
+      src: /home/vagrant/controller
+      dest: /home/vagrant
+      directory_mode: true
+      owner: vagrant
+      group: vagrant
+      mode: '0644'
+
+#  - name: Upgrade pip
+#    shell: pip install --upgrade pip
+
+  - name: Ensure pyhelm and dependencies are installed.
+    pip:
+      name:
+        - grpcio
+        - docker
+        - pyhelm
+      state: present
+
+  - name: Ensure setuptools and dependencies are installed.
+    pip:
+      name:
+        - setuptools 
+      extra_args: "--upgrade --ignore-installed"
+      state: present
+
+  - name: Ensure kubernetes and dependencies are installed.
+    pip:
+      name:
+        - kubernetes 
+      extra_args: "--upgrade --ignore-installed"
+      state: present
+
+  - name: Ensure openshift and dependencies are installed.
+    pip:
+      name:
+        - openshift
+      extra_args: "--upgrade --ignore-installed"
+      state: present
+
+  - name: Build an image and push it to a private repo
+    docker_image:
+      build:
+        path: /home/vagrant/docker/test
+      name: test 
+      tag: 1.0.0
+      source: build
+
+  - name: Apply CRD
+    k8s:
+      state: present
+      src: /home/vagrant/controller/crd.yaml
+
+  - name: Install Helm Chart
+    become: false
+    shell: helm install sample-controller --name-template sample-controller
+    args:
+      chdir: /home/vagrant/helm
+
+  - name: Apply Foo 
+    become: false
+    k8s:
+      state: present
+      src: /home/vagrant/controller/example-foo.yaml

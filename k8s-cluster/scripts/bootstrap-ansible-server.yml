@@ -1,0 +1,36 @@
+---
+- hosts: localhost 
+  gather_facts: no
+  become: true
+
+  tasks:
+    - name: Install a list of packages 
+      yum:
+        name:
+          - epel-release
+          - git 
+          - python-pip
+          - python-netaddr
+          - tree
+          - vim
+          - net-tools
+          - sshpass
+        state: present
+
+    - name: Ensure dependencies are installed.
+      pip:
+        name:
+          - pip 
+        extra_args: "--upgrade"
+        state: present
+
+    - name: Ensure dependencies are installed.
+      pip:
+        name:
+          - jinja2 
+        extra_args: "--upgrade"
+        state: present
+
+    - git:
+        repo: https://github.com/kubernetes-sigs/kubespray
+        dest: /home/vagrant/kubespray

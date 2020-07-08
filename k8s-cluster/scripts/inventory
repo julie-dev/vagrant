@@ -2,9 +2,9 @@
 # ## different ip than the default iface
 # ## We should set etcd_member_name for etcd cluster. The node that is not a etcd member do not need to set the value, or can set the empty string value.
 [all]
-master.k8s.test ansible_host=192.168.50.10 ip=192.168.50.10
-node1.k8s.test  ansible_host=192.168.50.11 ip=192.168.50.11
-node2.k8s.test  ansible_host=192.168.50.12 ip=192.168.50.12
+master.k8s.test ansible_host=192.168.50.10 ip=192.168.50.10 ansible_user=root ansible_password=vagrant
+node1.k8s.test  ansible_host=192.168.50.11 ip=192.168.50.11 ansible_user=root ansible_password=vagrant
+node2.k8s.test  ansible_host=192.168.50.12 ip=192.168.50.12 ansible_user=root ansible_password=vagrant
 
 # ## configure a bastion host if your nodes are not directly reachable
 # bastion ansible_host=x.x.x.x ansible_user=some_user

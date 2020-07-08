@@ -1,28 +1,4 @@
 ---
-- name: Bootstrap Ansible Server 
-  import_playbook: bootstrap.yml 
-
-- hosts: all
-  connection: local
-  gather_facts: no
-  vars:
-    ansible_password: vagrant
-
-  tasks:
-    - name: Automate SSH connections from ansible-server to ansible-client
-      import_tasks: auto_ssh_connect.yml
-
-    - name: Node Bootstraping
-      import_tasks: bootstrap-node.yml
-
-- hosts: localhost
-  gather_facts: no
-
-  tasks:
-    - git:
-        repo: https://github.com/kubernetes-sigs/kubespray
-        dest: /home/vagrant/kubespray
-
 - name: Launch Kubernetes
   import_playbook: kubespray/cluster.yml
 

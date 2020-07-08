@@ -1,23 +1,9 @@
 ---
-- hosts: localhost 
-  become: true
+- name: Bootstrap Ansible Server 
+  import_playbook: bootstrap-ansible-server.yml
 
-  tasks:
-  - name: Install a list of packages 
-    yum:
-      name:
-        - epel-release
-        - git 
-        - ansible 
-        - python-pip
-        - python-netaddr
-        - tree
-        - vim
-        - net-tools
-      state: present
+- name: SSH Connect
+  import_playbook: auto_ssh_connect.yml 
 
-  - name: Ensure dependencies are installed.
-    pip:
-      name:
-        - jinja2 
-      state: present
+- name: Bootstrap K8s Cluster Nodes
+  import_playbook: bootstrap-node.yml
